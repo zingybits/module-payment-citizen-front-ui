@@ -32,7 +32,7 @@ use Magento\Framework\HTTP\Header;
 class GetData extends \Magento\Framework\App\Action\Action
 {
 
-    const LOGGER_PREFIX = 'citizen_payment_gateway::Redirect/Process - ';
+    const LOGGER_PREFIX = 'citizen_payment_gateway::Payment/GetData - ';
 
     /**
      * @var Logger

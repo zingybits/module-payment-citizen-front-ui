@@ -35,7 +35,13 @@ define(
                     type: "GET"
                 }).done(function (data) {
                     globalThis.tingle = tingle;
-                    citizenAction(data);
+
+                    // citizenAction(data);
+
+                    if (data.transactionId !== undefined && data.publicApiKey !== undefined) {
+                        window.location.replace(url.build('citizen/payment/process/?transaction_id=' + data.transactionId));
+                    }
+
                 });
                 return false;
             }

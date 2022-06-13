@@ -19,15 +19,21 @@ declare(strict_types=1);
 
 namespace ZingyBits\CitizenFrontUi\Controller\Callback;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Payment\Gateway\Command\CommandPoolInterface;
+use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Reports\Model\ResourceModel\Order\CollectionFactory;
 use Psr\Log\LoggerInterface;
 use ZingyBits\CitizenCore\Gateway\Config\Config as GatewayConfig;
 use ZingyBits\CitizenCore\Model\Order\OrderStatus;
@@ -77,6 +83,27 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
      */
     private $resultFactory;
 
+    /**
+     * @var PaymentDataObjectFactory
+     */
+    private $paymentDataObjectFactory;
+
+    /**
+     * @var CommandPoolInterface
+     */
+    private $commandPool;
+
+    /**
+     * @var CollectionFactory
+     */
+    private $paymentCollectionFactory;
+
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+
     public function __construct(
         LoggerInterface                 $logger,
         Http                            $request,
@@ -85,7 +112,11 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
         OrderStatus                     $orderStatus,
         OrderFactory                    $orderFactory,
         Config                          $config,
-        ResultFactory                   $resultFactory
+        ResultFactory                   $resultFactory,
+        PaymentDataObjectFactory        $paymentDataObjectFactory,
+        CommandPoolInterface            $commandPool,
+        CollectionFactory               $paymentCollectionFactory,
+        Session                         $checkoutSession
     )
     {
         $this->logger = $logger;
@@ -96,58 +127,86 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
         $this->orderFactory = $orderFactory;
         $this->config = $config;
         $this->resultFactory = $resultFactory;
+        $this->paymentDataObjectFactory = $paymentDataObjectFactory;
+        $this->commandPool = $commandPool;
+        $this->paymentCollectionFactory = $paymentCollectionFactory;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function execute()
     {
         // get data response
-        $response = $this->request->getPostValue();
-        if (isset($response) && isset($response['data'])) {
-            $data = $response['data'];
+        $transactionId = $this->request->getParam('paymentId');
+
+        if (!$transactionId) {
+            $this->logger->error(static::LOGGER_PREFIX . 'Not have transactionId');
+            return false;
+        }
+
+        $order = $this->getPaymentByTransId($transactionId);
+        $payment = $order->getPayment();
+
+        $buildSubject = [
+            'order' => $order,
+            'payment' => $this->paymentDataObjectFactory->create($payment),
+        ];
+
+        if ($payment->getCcTransId()) {
+            $response = $this->commandPool->get('check')->execute($buildSubject);
         } else {
+            $this->logger->error(self::LOGGER_PREFIX . 'not have status in response');
+        }
+
+        $response = ($response['response'][0])
+            ? json_decode($response['response'][0], true)
+            : null;
+
+        if (!isset($response) || !isset($response[GatewayConfig::GATEWAY_RESPONSE_TRANSACTION_STATUS])) {
             $this->logger->error(static::LOGGER_PREFIX . 'Not have response');
         }
 
-        // todo hash param change
-        if (!$hash = $this->request->getParam(GatewayConfig::INTERNAL_QUOTE_MASK_ID_CODE)) {
-            $this->logger->error(static::LOGGER_PREFIX . 'No parameter hash');
-        }
+        $paymentStatus = $response[GatewayConfig::GATEWAY_RESPONSE_TRANSACTION_STATUS];
+        $paymentStatusGateway = Enum::TERMINAL_STATUSES_MAPPING[$paymentStatus];
+        $oldStatus = $order->getStatus();
 
-        $quoteId = $this->maskedQuoteIdToQuoteId->execute($hash);
-        $quote = $this->quoteRepository->get($quoteId);
+        if ($paymentStatus != ENUM::TERMINAL_STATUSES_ERROR &&
+            in_array($paymentStatus, Enum::TERMINAL_STATUSES)
+        ) {
+            if ($oldStatus != $paymentStatusGateway) {
+                $this->orderStatus->changeStatus($order, $paymentStatus);
+            }
 
-        if ($quote->getId() && $quote->getReservedOrderId()) {
-            $orderIncrementId = $quote->getReservedOrderId();
-            $order = $this->orderFactory->create()->loadByIncrementId($orderIncrementId);
-        } else {
-            $this->logger->error(self::LOGGER_PREFIX . 'unable to load quote or get its order id', ['quote ID' => $quoteId]);
-        }
+            if (in_array($paymentStatus, Enum::TERMINAL_STATUSES_SUCCESS_PAGE)) {
+                $redirectPageUrl = $this->config->getSuccessPage();
+                $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+                $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+                $this->checkoutSession->setLastOrderId($order->getEntityId());
+            } else {
+                $redirectPageUrl = $this->config->getFailurePage();
+            }
 
-//        $paymentStatus = $data[Config::GATEWAY_RESPONSE_PAYMENT_STATUS];
-
-        // todo - test statuses, delete when done
-//        $paymentStatus = 'PENDING_USER_AUTHORISATION';
-        $paymentStatus = 'ACCEPTED';
-//        $paymentStatus = 'PAYMENT_CANCELLED';
-//        $paymentStatus = 'REJECTED_BY_ASPSP';
-//        $paymentStatus = 'FAILED';
-
-        if (in_array($paymentStatus, Enum::TERMINAL_STATUSES)) {
-            $isChangedStatus = $this->orderStatus->changeStatus($order, $paymentStatus);
-            $redirectPageUrl = (in_array($paymentStatus, Enum::TERMINAL_STATUSES_SUCCESS_PAGE))
-                ? $this->config->getSuccessPage()
-                : $this->config->getFailurePage();
         } else {
             $this->logger->error(static::LOGGER_PREFIX . 'Incorrect status in response');
             $redirectPageUrl = 'noroute';
         }
 
 
-
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $resultRedirect->setPath($redirectPageUrl);
-        return $resultRedirect;
 
+        return $resultRedirect->setPath($redirectPageUrl);
+
+    }
+
+    public function getPaymentByTransId($transId)
+    {
+        $orders = $this->paymentCollectionFactory->create();
+
+        $orders->getSelect()->joinLeft(
+            ['sop' => 'sales_order_payment'],
+            'sop.parent_id = main_table.entity_id',
+            'method'
+        )->where('cc_trans_id = ?', $transId);;
+        return $orders->getLastItem();
     }
 
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException

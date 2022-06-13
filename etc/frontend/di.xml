@@ -36,6 +36,20 @@
     </type>
 
     <!-- ConfigInterface instantiation -->
+    <type name="ZingyBits\CitizenFrontUi\Controller\Payment\Process">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">CitizenPaymentGatewayCommandPool</argument>
+        </arguments>
+    </type>
+
+    <!-- ConfigInterface instantiation -->
+    <type name="ZingyBits\CitizenFrontUi\Controller\Callback\Response">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">CitizenPaymentGatewayCommandPool</argument>
+        </arguments>
+    </type>
+
+    <!-- ConfigInterface instantiation -->
     <type name="ZingyBits\CitizenFrontUi\Controller\Callback\CheckOrders">
         <arguments>
             <argument name="commandPool" xsi:type="object">CitizenPaymentGatewayCommandPool</argument>
