@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Citizen payment gateway by ZingyBits - Magento 2 extension
  *
@@ -14,7 +13,6 @@
  * @license http://www.zingybits.com/business-license
  * @author ZingyBits s.r.o. <support@zingybits.com>
  */
-
 namespace ZingyBits\CitizenFrontUi\Controller\Payment;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;

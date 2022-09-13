@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Citizen payment gateway by ZingyBits - Magento 2 extension
  *
@@ -14,7 +13,6 @@
  * @license http://www.zingybits.com/business-license
  * @author ZingyBits s.r.o. <support@zingybits.com>
  */
-
 declare(strict_types=1);
 
 namespace ZingyBits\CitizenFrontUi\Model\Ui;
@@ -54,5 +52,4 @@ final class ConfigProvider implements ConfigProviderInterface
     {
         return self::PROCESS_TRANSACTION_URL;
     }
-
 }

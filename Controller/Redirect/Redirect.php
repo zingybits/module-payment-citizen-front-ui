@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Citizen payment gateway by ZingyBits - Magento 2 extension
  *
@@ -19,14 +18,13 @@ namespace ZingyBits\CitizenFrontUi\Controller\Redirect;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Sales\Model\OrderFactory;
-use Psr\Log\LoggerInterface as Logger;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
+use Psr\Log\LoggerInterface as Logger;
 use ZingyBits\CitizenCore\Model\Order\LoadOrder;
 use ZingyBits\CitizenCore\Model\Order\OrderStatus;
-use Magento\Framework\Controller\Result\JsonFactory;
-
 
 class Redirect extends \Magento\Framework\App\Action\Action
 {
@@ -70,7 +68,16 @@ class Redirect extends \Magento\Framework\App\Action\Action
      */
     private $jsonResultFactory;
 
-
+    /**
+     * @param Logger $logger
+     * @param Context $context
+     * @param OrderFactory $orderFactory
+     * @param QuoteFactory $quoteFactory
+     * @param MaskedQuoteIdToQuoteIdInterface $maskToQuoteId
+     * @param LoadOrder $loadOrder
+     * @param OrderStatus $orderStatus
+     * @param JsonFactory $jsonResultFactory
+     */
     public function __construct(
         Logger                          $logger,
         Context                         $context,
@@ -80,8 +87,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
         LoadOrder                       $loadOrder,
         OrderStatus                     $orderStatus,
         JsonFactory                     $jsonResultFactory
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->orderFactory = $orderFactory;
         $this->quoteFactory = $quoteFactory;
@@ -101,21 +107,19 @@ class Redirect extends \Magento\Framework\App\Action\Action
             'redirectUrl' => null
         ];
 
-        // /citizen/redirect/redirect/qid/pImbAulWZyVbghf7lfP2NCap0N2kZib9
         $request = $this->getRequest();
         $order = $this->loadOrder->getOrder($request);
 
         $redirectPageUrl = $this->orderStatus->getRedirectPageUrl($order);
         $resultData['redirectUrl'] = $redirectPageUrl;
 
-        if (!$redirectPageUrl) {
-            $this->logger->error(static::LOGGER_PREFIX . 'redirect page url null');
+        if (! $redirectPageUrl) {
+            $this->logger->error(static::LOGGER_PREFIX . 'redirect page url is null');
         }
-
 
         $result = $this->jsonResultFactory->create();
         $result->setData($resultData);
+
         return $result;
     }
-
 }

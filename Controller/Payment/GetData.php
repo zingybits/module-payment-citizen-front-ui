@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Citizen payment gateway by ZingyBits - Magento 2 extension
  *
@@ -28,10 +27,8 @@ use ZingyBits\CitizenCore\Model\Order\LoadOrder;
 use Magento\Sales\Api\OrderPaymentRepositoryInterface;
 use Magento\Framework\HTTP\Header;
 
-
 class GetData extends \Magento\Framework\App\Action\Action
 {
-
     const LOGGER_PREFIX = 'citizen_payment_gateway::Payment/GetData - ';
 
     /**
@@ -64,7 +61,16 @@ class GetData extends \Magento\Framework\App\Action\Action
      */
     private $httpHeader;
 
-
+    /**
+     * @param Logger $logger
+     * @param Context $context
+     * @param CommandPoolInterface $commandPool
+     * @param PaymentDataObjectFactory $paymentDataObjectFactory
+     * @param ConfigInterface $config
+     * @param LoadOrder $loadOrder
+     * @param OrderPaymentRepositoryInterface $orderPaymentRepository
+     * @param Header $httpHeader
+     */
     public function __construct(
         Logger                          $logger,
         Context                         $context,
@@ -74,8 +80,7 @@ class GetData extends \Magento\Framework\App\Action\Action
         LoadOrder                       $loadOrder,
         OrderPaymentRepositoryInterface $orderPaymentRepository,
         Header                          $httpHeader
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->commandPool = $commandPool;
         $this->paymentDataObjectFactory = $paymentDataObjectFactory;
@@ -104,29 +109,35 @@ class GetData extends \Magento\Framework\App\Action\Action
             'payment' => $this->paymentDataObjectFactory->create($payment),
         ];
 
-        $result = $this->commandPool->get('initialize')->execute($buildSubject);
+        $response = $this->commandPool->get('initialize')->execute($buildSubject)['response'][0];
 
-        if ($result['response'] && $result['response'][0]) {
-            $transactionId = $result['response'][0];
+        $resultArr = json_decode($response,1 );
+        if ($resultArr == null) {
+            $transactionId = $response;
+        } else {
+            $this->logger->error(static::LOGGER_PREFIX .
+                'Error code - ' . $resultArr['status'] . ', Error message - ' . $resultArr['message']);
         }
 
-
-        if ($transactionId) {
+        if (isset($transactionId)) {
             $this->orderPaymentRepository->save($payment);
 
             $response = [
                 'transactionId' => $transactionId,
                 'publicApiKey' => $this->config->getPublicKey(),
+                'isProd' => $this->config->isProduction(),
+                'urlSdk' => $this->config->isProduction()
+                    ? $this->config->getUrlProdSdk()
+                    : $this->config->getUrlTestSdk()
             ];
 
         } else {
-            $this->logger->error(static::LOGGER_PREFIX . 'Not have transactionId');
+            $this->logger->error(static::LOGGER_PREFIX . 'Not having transactionId');
         }
 
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $resultJson->setData($response);
+
         return $resultJson;
     }
-
-
 }

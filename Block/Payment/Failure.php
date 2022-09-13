@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Citizen payment gateway by ZingyBits - Magento 2 extension
  *
@@ -27,13 +26,10 @@ class Failure extends \Magento\Framework\View\Element\Template
      * Return QS params
      * @return array
      */
-    public function showParams()
+    public function showParams(): array
     {
         $params = $this->getRequest()->getParams();
-        if(isset($params['response'])){
-            return $params['response'];
-        }
 
-        return [];
+        return $params ?? [];
     }
 }

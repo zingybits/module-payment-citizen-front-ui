@@ -1,0 +1,57 @@
+.payment-method-citizen .actions-toolbar {
+    margin-left: 0 !important;
+}
+.payment-method-citizen .actions-toolbar .primary {
+    width: 100% !important;
+    float: left !important;
+}
+.payment-method-citizen .action.primary, .payment-method-citizen .action-primary {
+    width: 100% !important;
+    background: #5728A8;
+    border: 1px solid #5728A8;
+}
+.payment-method-citizen .action.primary:hover, .payment-method-citizen .action-primary:hover {
+    background: #4b14a9;
+    border: 1px solid #4b14a9;
+}
+
+.payment-method-citizen .payment-method-content {
+    max-width: 300px;
+}
+
+.payment-method-citizen._active .payment-method-title {
+    padding: 20px 0 5px;
+    font-weight: 700;
+}
+
+.payment-method-citizen .payment-method-content__title {
+    margin-bottom: 10px;
+}
+
+.payment-method-citizen .payment-method-content__image {
+    margin-bottom: 20px;
+}
+
+.payment-method-citizen .payment-method-content__desc {
+    margin-bottom: 10px;
+    color: #81878F;
+    font-size: 12px;
+}
+
+.payment-method-citizen .action.primary.checkout{
+    font-size: 14px !important;
+    font-weight: 500;
+    border-radius: 5px !important;
+    line-height: 0.8rem !important;
+}
+
+@media (max-width: 768px) {
+    .payment-method-citizen._active .payment-method-title {
+        padding: 20px 15px 5px;
+    }
+
+    .payment-method-citizen .actions-toolbar .primary {
+        float: inherit !important;
+    }
+}
+

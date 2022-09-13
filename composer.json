@@ -2,12 +2,11 @@
     "name": "zingybits/module-payment-citizen-front-ui",
     "description": "Citizen payment module for Magento 2 - Frontend UI part",
     "type": "magento2-module",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "license": "GPL-3.0",
     "require": {
-        "php": ">=7.1.0",
+        "zingybits/module-payment-citizen-core": "*",
         "magento/framework": "*",
-        "magento/magento-composer-installer": "*",
         "magento/module-checkout": "*",
         "magento/module-config": "*",
         "magento/module-payment": "*",
@@ -15,7 +14,7 @@
         "magento/module-sales": "*",
         "magento/module-store": "*",
         "ext-json": "*"
-    },    
+    },
     "authors": [
         {
             "name": "ZingyBits",

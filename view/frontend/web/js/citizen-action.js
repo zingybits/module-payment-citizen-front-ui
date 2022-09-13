@@ -1,65 +1,35 @@
-/**
- * @citizen-action
- */
-define(
-    [
-        'sdkpayin'
-    ],
-    function () {
+/*browser:true*/
+/*global define*/
+define(['ZingyBits_CitizenFrontUi/js/citizen-sdk', 'Magento_Checkout/js/model/full-screen-loader'], function (citizenSdk, fullScreenLoader) {
         'use strict';
-
         /**
          * place action on Citizen
          */
-        return function (data) {
-            //globalThis.tingle = tingle;
-            globalThis.citizenData = data;
 
-            window.citizenAsyncInit = function () {
-                CITIZEN_PAYIN.init({
-                    publicApiKey: citizenData.publicApiKey
-                })
-            };
-
-            // DIRECT journey
-            let sendDirectPayIn = function (citizenTransactionId) {
+        function placeAction(citizenData) {
+            window.sendDirectPayIn = function (citizenTransactionId) {
                 window.CITIZEN_PAYIN.startPayInJourney(citizenTransactionId);
             }
 
-            // Email journey
-            let options = {
-                initiatedCallback: function () {
-                    console.log("This function called when the modal is about to open")
-                }
-            }
-
-            let sendEmailPayIn = function (citizenTransactionId, options) {
-                window.CITIZEN_PAYIN.startEmailPayInJourney(citizenTransactionId, options);
-            }
-
             // QR code journey
-            let sendQRCodePayIn = function (citizenTransactionId) {
+            window.sendQRCodePayIn = function (citizenTransactionId) {
                 window.CITIZEN_PAYIN.startQRCodePayInJourney(citizenTransactionId);
             }
 
-
-            window.citizenAsyncInit();
             // for phone
-            sendDirectPayIn(citizenData.transactionId);
+            if (window.screen.availWidth > 768) {
+                window.sendQRCodePayIn(citizenData.transactionId);
+            } else {
+                window.sendDirectPayIn(citizenData.transactionId);
+            }
+            return true;
+        }
 
-            // for desktop
-            // sendQRCodePayIn(citizenData.transactionId);
-            // sendEmailPayIn(citizenData.transactionId, options);
-
-
-            // if (citizenData.isPhone) {
-            //     sendPayIn(citizenData.transactionId);
-            //     console.log('sendPayIn');
-            // } else {
-            //     sendQRCodePayIn(citizenData.transactionId);
-            //     console.log('sendQRCodePayIn');
-            // }
-
+        return function (citizenData) {
+            citizenSdk(citizenData).then(() => {
+                placeAction(citizenData)
+                fullScreenLoader.stopLoader();
+            })
 
         };
     }

@@ -1,8 +1,18 @@
-<h2><?php echo __('Unfortunately, your order has not been paid.') ?></h2>
+<?php
+/** @var \ZingyBits\CitizenFrontUi\Block\Payment\Failure $block */
+$params = $block->showParams();
+$message = ($params && isset($params['transId']) && $params['transId']==0)
+    ? 'Order with this transaction ID was not found.'
+    : 'Unfortunately, your order has not been paid.';
+?>
+
+<h2><?php echo __($message) ?></h2>
 <div><?php echo __('Please contact the support team.'); ?></div>
+
 <script>
     setTimeout(function(){
         location.href = '/';
     }, 10000);
 </script>
+
 

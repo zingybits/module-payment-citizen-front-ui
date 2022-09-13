@@ -1,10 +1,4 @@
-<!--
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
-<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+<div class="payment-method payment-method-citizen" data-bind="css: {'_active': (getCode() == isChecked())}">
     <div class="payment-method-title field choice">
         <input type="radio"
                name="payment[method]"
@@ -13,21 +7,30 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
-        <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
+        <div class="payment-method-content__title"  data-bind="text: getPhraseTitle()"></div>
+        <img class="payment-method-content__image" data-bind="attr: { src: require.toUrl('ZingyBits_CitizenFrontUi/images/')+'bank_icons.svg', alt: 'bank_items'}" />
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+
+        <!-- ko if: isDesktop() -->
+        <div class="payment-method-content__desc"  data-bind="text: getDesktopDesc()"></div>
+        <!-- /ko -->
+
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
-                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
 
         <div class="actions-toolbar">
+            <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
                         data-bind="
@@ -37,8 +40,12 @@
                         enable: (getCode() == isChecked())
                         "
                         disabled>
-                    <span data-bind="i18n: 'Place Order'"></span>
+                    <span data-bind="text: getButtonText() + ' ' + getSubTotal()"></span>
+
                 </button>
+            </div>
         </div>
+
     </div>
 </div>
+

@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="ZingyBits_CitizenFrontUi::css/styles.css"/>
+    </head>
     <body>
 		<referenceBlock name="checkout.root">
 			<arguments>
@@ -37,5 +40,9 @@
 				</argument>
 			</arguments>
 		</referenceBlock>
+        <referenceContainer name="after.body.start">
+            <block class="ZingyBits\CitizenFrontUi\Block\Payment\Info" template="ZingyBits_CitizenFrontUi::/checkout/beforeBodyEndJs.phtml" name="citizen_before_body_end_js"/>
+        </referenceContainer>
+
 	</body>
 </page>

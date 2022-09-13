@@ -1,0 +1,9 @@
+<?php
+/** @var \ZingyBits\CitizenFrontUi\Block\Payment\Info $block */
+$data = $block->getCheckoutInfo();
+$isProd = $block->isProduction();
+$jsonData = json_encode($data, JSON_HEX_APOS);
+?>
+<script>
+    var citizenCheckoutConfigData = JSON.parse('<?=$jsonData?>');
+</script>
