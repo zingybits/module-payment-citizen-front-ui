@@ -29,7 +29,7 @@ use Magento\Framework\HTTP\Header;
 
 class GetData extends \Magento\Framework\App\Action\Action
 {
-    const LOGGER_PREFIX = 'citizen_payment_gateway::Payment/GetData - ';
+    public const LOGGER_PREFIX = 'citizen_payment_gateway::Payment/GetData - ';
 
     /**
      * @var Logger
@@ -111,7 +111,7 @@ class GetData extends \Magento\Framework\App\Action\Action
 
         $response = $this->commandPool->get('initialize')->execute($buildSubject)['response'][0];
 
-        $resultArr = json_decode($response,1 );
+        $resultArr = json_decode($response, 1);
         if ($resultArr == null) {
             $transactionId = $response;
         } else {

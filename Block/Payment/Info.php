@@ -37,6 +37,8 @@ class Info extends Template
     }
 
     /**
+     * Return data for js
+     *
      * @return array
      */
     public function getCheckoutInfo(): array
@@ -53,9 +55,11 @@ class Info extends Template
     }
 
     /**
+     * Return config value
+     *
      * @return string
      */
-    public function isProduction()
+    public function isProduction(): string
     {
         return $this->config->isProduction();
     }

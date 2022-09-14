@@ -28,10 +28,10 @@ use ZingyBits\CitizenCore\Model\Order\OrderStatus;
 
 class Redirect extends \Magento\Framework\App\Action\Action
 {
-    const LOGGER_PREFIX = 'citizen_payment_gateway::Redirect/Redirect - ';
+    public const LOGGER_PREFIX = 'citizen_payment_gateway::Redirect/Redirect - ';
 
-    const ORDER_INCREMENT_ID_PARAM = 'orderId';
-    const QUOTE_ID_PARAM = 'qid';
+    public const ORDER_INCREMENT_ID_PARAM = 'orderId';
+    public const QUOTE_ID_PARAM = 'qid';
 
     /**
      * @var Logger

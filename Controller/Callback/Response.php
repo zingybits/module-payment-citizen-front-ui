@@ -40,10 +40,6 @@ use ZingyBits\CitizenCore\Model\Order\OrderStatus;
 use ZingyBits\CitizenCore\Gateway\Config\Enum;
 use ZingyBits\CitizenCore\Model\Config;
 
-/**
- * Class Response
- * @package ZingyBits\CitizenDebug\Controller\Callback
- */
 class Response implements HttpGetActionInterface, CsrfAwareActionInterface
 {
     public const LOGGER_PREFIX = 'Citizen_FrontUi::Callback/Response - ';
@@ -146,6 +142,8 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
     }
 
     /**
+     * Response handler
+     *
      * @return mixed
      */
     public function execute()
@@ -159,9 +157,9 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
         if (!$transactionId) {
             $transactionId = $this->request->getParam('citizenTransactionId');
 
-            if (!$transactionId ) {
+            if (!$transactionId) {
                 $this->logger->error(static::LOGGER_PREFIX . 'Not have transactionId');
-                return $resultRedirect->setPath($redirectPageUrl.'?transId=0');
+                return $resultRedirect->setPath($redirectPageUrl . '?transId=0');
             }
         }
 
@@ -218,6 +216,8 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
     }
 
     /**
+     * Get payment by transaction ID
+     *
      * @param $transactionId
      * @return DataObject|null
      */
@@ -235,8 +235,7 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
     }
 
     /**
-     * @param RequestInterface $request
-     * @return InvalidRequestException|null
+     * @inheritDoc
      */
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
     {
@@ -244,12 +243,10 @@ class Response implements HttpGetActionInterface, CsrfAwareActionInterface
     }
 
     /**
-     * @param RequestInterface $request
-     * @return bool|null
+     * @inheritDoc
      */
     public function validateForCsrf(RequestInterface $request): ?bool
     {
         return true;
     }
 }
-

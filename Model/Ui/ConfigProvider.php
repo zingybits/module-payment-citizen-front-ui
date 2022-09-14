@@ -19,13 +19,10 @@ namespace ZingyBits\CitizenFrontUi\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 
-/**
- * Class ConfigProvider
- */
-final class ConfigProvider implements ConfigProviderInterface
+class ConfigProvider implements ConfigProviderInterface
 {
-    const CODE = 'citizen';
-    const PROCESS_TRANSACTION_URL = '/citizen/redirect/process/';
+    public const CODE = 'citizen';
+    public const PROCESS_TRANSACTION_URL = '/citizen/redirect/process/';
 
     /**
      * Retrieve assoc array of checkout configuration

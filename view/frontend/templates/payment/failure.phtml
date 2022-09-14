@@ -6,8 +6,8 @@ $message = ($params && isset($params['transId']) && $params['transId']==0)
     : 'Unfortunately, your order has not been paid.';
 ?>
 
-<h2><?php echo __($message) ?></h2>
-<div><?php echo __('Please contact the support team.'); ?></div>
+<h2><?=__($message)?></h2>
+<div><?=__('Please contact the support team.')?></div>
 
 <script>
     setTimeout(function(){

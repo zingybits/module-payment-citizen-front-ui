@@ -18,10 +18,6 @@ namespace ZingyBits\CitizenFrontUi\Block;
 use Magento\Framework\Phrase;
 use Magento\Payment\Block\ConfigurableInfo;
 
-/**
- * Class Info
- * @package ZingyBits\CitizenFrontUi\Block
- */
 class Info extends ConfigurableInfo
 {
     /**
@@ -33,17 +29,5 @@ class Info extends ConfigurableInfo
     protected function getLabel($field)
     {
         return __($field);
-    }
-
-    /**
-     * Returns value view
-     *
-     * @param string $field
-     * @param string $value
-     * @return string | Phrase
-     */
-    protected function getValueView($field, $value)
-    {
-        return parent::getValueView($field, $value);
     }
 }

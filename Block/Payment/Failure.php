@@ -16,14 +16,11 @@
 
 namespace ZingyBits\CitizenFrontUi\Block\Payment;
 
-/**
- * Class Failure
- * @package ZingyBits\CitizenFrontUi\Block\Payment
- */
 class Failure extends \Magento\Framework\View\Element\Template
 {
     /**
      * Return QS params
+     *
      * @return array
      */
     public function showParams(): array
