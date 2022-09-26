@@ -63,6 +63,9 @@ define(
             isDesktop: function () {
                 return (window.screen.availWidth > 768);
             },
+            getTitle: function () {
+                return this.citizenCheckoutConfigData['title'];
+            },
             getPhraseTitle: function () {
                 return this.citizenCheckoutConfigData['phrase_title'];
             },

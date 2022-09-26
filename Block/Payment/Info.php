@@ -44,6 +44,7 @@ class Info extends Template
     public function getCheckoutInfo(): array
     {
         $data = [
+            'title' => $this->config->getCheckoutTitle(),
             'phrase_title' => $this->config->getCheckoutPhraseTitle(),
             'desktop_desc' => $this->config->getCheckoutDesktopDesc(),
             'desktop_button_text' => $this->config->getCheckoutDesktopButtonText(),
